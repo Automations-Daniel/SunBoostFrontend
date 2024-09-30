@@ -1,7 +1,6 @@
 import requests
 import streamlit as st
 
-
 API_URL = "http://127.0.0.1:8000"
 CLIENTS_ENDPOINT = "/data/clients/"
 GENERAL_ANALYSIS_ENDPOINT = "/data/general/video-performance"
@@ -17,8 +16,9 @@ def get_clients():
         return []
 
 
-def get_closed_data(client_name):
-    response = requests.get(f"{API_URL}/data/closed/{client_name}")
+def get_closed_data(client_name, start_date=None, end_date=None):
+    params = {"start_date": start_date, "end_date": end_date}
+    response = requests.get(f"{API_URL}/data/closed/{client_name}", params=params)
     if response.status_code == 200:
         return response.json()
     else:
@@ -26,8 +26,9 @@ def get_closed_data(client_name):
         return []
 
 
-def get_appointments_data(client_name):
-    response = requests.get(f"{API_URL}/data/appointments/{client_name}")
+def get_appointments_data(client_name, start_date=None, end_date=None):
+    params = {"start_date": start_date, "end_date": end_date}
+    response = requests.get(f"{API_URL}/data/appointments/{client_name}", params=params)
     if response.status_code == 200:
         return response.json()
     else:
@@ -35,10 +36,11 @@ def get_appointments_data(client_name):
         return []
 
 
-def get_quality_data(client_name, video_id):
-    response = requests.get(
-        f"{API_URL}/data/quality/{client_name}?nomenclatura={video_id}"
-    )
+# Función ajustada para analizar la calidad con las fechas opcionales
+def get_quality_data(client_name, video_id, start_date=None, end_date=None):
+    # Agregar las fechas como parámetros opcionales
+    params = {"nomenclatura": video_id, "start_date": start_date, "end_date": end_date}
+    response = requests.get(f"{API_URL}/data/quality/{client_name}", params=params)
     if response.status_code == 200:
         return response.json()
     else:
@@ -46,7 +48,6 @@ def get_quality_data(client_name, video_id):
         return []
 
 
-# Nueva función para obtener el análisis general
 @st.cache_data
 def get_general_video_performance():
     response = requests.get(API_URL + GENERAL_ANALYSIS_ENDPOINT)
