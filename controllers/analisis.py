@@ -49,8 +49,9 @@ def get_quality_data(client_name, video_id, start_date=None, end_date=None):
 
 
 @st.cache_data
-def get_general_video_performance():
-    response = requests.get(API_URL + GENERAL_ANALYSIS_ENDPOINT)
+def get_general_video_performance(start_date=None, end_date=None):
+    params = {"start_date": start_date, "end_date": end_date}
+    response = requests.get(f"{API_URL}{GENERAL_ANALYSIS_ENDPOINT}", params=params)
     if response.status_code == 200:
         return response.json()
     else:
