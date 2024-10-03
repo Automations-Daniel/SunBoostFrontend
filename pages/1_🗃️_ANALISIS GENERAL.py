@@ -50,11 +50,9 @@ date_option = st.selectbox(
 
 # Inicializar fechas en función de la opción seleccionada
 if date_option == "Seleccionar manualmente":
-    # Selectores de fecha manual
-    start_date = st.date_input("Fecha de inicio", value=None, key="start_date_manual")
-    end_date = st.date_input("Fecha de fin", value=None, key="end_date_manual")
+    start_date = st.date_input("Fecha de inicio", value=None)
+    end_date = st.date_input("Fecha de fin", value=None)
 else:
-    # Calcular fechas basadas en la opción predefinida seleccionada
     start_date, end_date = get_date_range(date_option)
     st.write(
         f"Rango de fechas seleccionado: {start_date.strftime('%Y-%m-%d') if start_date else 'Sin inicio'} - {end_date.strftime('%Y-%m-%d') if end_date else 'Sin fin'}"
@@ -75,32 +73,28 @@ def load_general_performance(start_date=None, end_date=None):
     return pd.DataFrame(get_general_video_performance(start_date, end_date))
 
 
-# Estado de la aplicación para controlar la actualización de datos
-if "reload_general_performance" not in st.session_state:
-    st.session_state.reload_general_performance = False
+# Estado de la aplicación para almacenar los resultados de cada opción
+if "analysis_results" not in st.session_state:
+    st.session_state.analysis_results = {}  # Inicializa un diccionario para cada opción
 
-# Guardar las fechas seleccionadas en el estado al presionar el botón
+# Botón para actualizar datos
 if st.button("Actualizar análisis general"):
     clear_cache()  # Limpiar la caché
-    st.session_state.reload_general_performance = (
-        True  # Cambiar estado para forzar la recarga
+    # Realizar el análisis y almacenarlo en la opción actual seleccionada
+    st.session_state.analysis_results[date_option] = load_general_performance(
+        start_date_str, end_date_str
     )
-    # Guardar las fechas y el rango en el estado solo al presionar el botón
-    st.session_state.start_date_str = start_date_str
-    st.session_state.end_date_str = end_date_str
 
-# Usar los valores del estado para hacer la solicitud al backend
-if st.session_state.reload_general_performance:
-    general_performance = load_general_performance(
-        st.session_state.start_date_str, st.session_state.end_date_str
-    )
+# Decidir si mostrar los datos según la opción seleccionada
+if date_option in st.session_state.analysis_results:
+    general_performance = st.session_state.analysis_results[date_option]
 else:
-    general_performance = (
-        pd.DataFrame()
-    )  # No cargar datos hasta que se haga clic en actualizar
+    general_performance = pd.DataFrame()  # DataFrame vacío si no hay análisis previo
 
 # Mostrar los datos si están disponibles
 if general_performance.empty:
-    st.warning("No hay datos de análisis general disponibles.")
+    st.warning(
+        "No hay datos de análisis general disponibles para la opción seleccionada."
+    )
 else:
     st.dataframe(general_performance)
