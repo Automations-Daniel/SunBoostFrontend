@@ -51,8 +51,8 @@ date_option = st.selectbox(
 # Inicializar fechas en función de la opción seleccionada
 if date_option == "Seleccionar manualmente":
     # Selectores de fecha manual
-    start_date = st.date_input("Fecha de inicio", value=None)
-    end_date = st.date_input("Fecha de fin", value=None)
+    start_date = st.date_input("Fecha de inicio", value=None, key="start_date_manual")
+    end_date = st.date_input("Fecha de fin", value=None, key="end_date_manual")
 else:
     # Calcular fechas basadas en la opción predefinida seleccionada
     start_date, end_date = get_date_range(date_option)
@@ -79,19 +79,25 @@ def load_general_performance(start_date=None, end_date=None):
 if "reload_general_performance" not in st.session_state:
     st.session_state.reload_general_performance = False
 
-# Botón para actualizar datos, ahora está al final de la página
+# Guardar las fechas seleccionadas en el estado al presionar el botón
 if st.button("Actualizar análisis general"):
     clear_cache()  # Limpiar la caché
     st.session_state.reload_general_performance = (
         True  # Cambiar estado para forzar la recarga
     )
-    general_performance = load_general_performance(
-        start_date_str, end_date_str
-    )  # Cargar datos inmediatamente tras limpiar la caché
+    # Guardar las fechas y el rango en el estado solo al presionar el botón
+    st.session_state.start_date_str = start_date_str
+    st.session_state.end_date_str = end_date_str
 
-# Decidir si cargar el DataFrame desde la caché o recargar desde el servidor
+# Usar los valores del estado para hacer la solicitud al backend
+if st.session_state.reload_general_performance:
+    general_performance = load_general_performance(
+        st.session_state.start_date_str, st.session_state.end_date_str
+    )
 else:
-    general_performance = load_general_performance(start_date_str, end_date_str)
+    general_performance = (
+        pd.DataFrame()
+    )  # No cargar datos hasta que se haga clic en actualizar
 
 # Mostrar los datos si están disponibles
 if general_performance.empty:
