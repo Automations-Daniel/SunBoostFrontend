@@ -37,9 +37,9 @@ def get_appointments_data(client_name, start_date=None, end_date=None):
 
 
 # Función ajustada para analizar la calidad con las fechas opcionales
-def get_quality_data(client_name, video_id, start_date=None, end_date=None):
+def get_quality_data(client_name, start_date=None, end_date=None):
     # Agregar las fechas como parámetros opcionales
-    params = {"nomenclatura": video_id, "start_date": start_date, "end_date": end_date}
+    params = {"start_date": start_date, "end_date": end_date}
     response = requests.get(f"{API_URL}/data/quality/{client_name}", params=params)
     if response.status_code == 200:
         return response.json()

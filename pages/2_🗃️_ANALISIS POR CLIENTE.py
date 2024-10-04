@@ -88,25 +88,15 @@ if clientes:
                 "{:.2f}%".format
             )
             st.dataframe(df_cierres)
-            # Selectbox para seleccionar el video y analizar calidad
-            video_seleccionado = st.selectbox(
-                "Selecciona un video para analizar su calidad",
-                df_cierres["Video ID"].unique(),
-            )
-            if st.button("Analizar calidad"):
+            if st.button("Analizar calidad y distribución"):
                 # Enviar las fechas como parámetros opcionales al analizar la calidad
                 calidad_datos = get_quality_data(
                     cliente_seleccionado,
-                    video_seleccionado,
                     start_date_str,
                     end_date_str,
                 )
                 if calidad_datos:
                     df_calidad = pd.DataFrame(calidad_datos)
-                    # Aplicar el formato de porcentaje a la columna "Porcentaje"
-                    df_calidad["Porcentaje"] = df_calidad["Porcentaje"].map(
-                        "{:.2f}%".format
-                    )
                     st.dataframe(df_calidad)
 
     elif menu_option == "Analizar Creativos por Citas":
@@ -120,22 +110,12 @@ if clientes:
         else:
             df_citas["Tasa de Citas"] = df_citas["Tasa de Citas"].map("{:.2f}%".format)
             st.dataframe(df_citas)
-            # Selectbox para seleccionar el video y analizar calidad
-            video_seleccionado = st.selectbox(
-                "Selecciona un video para analizar su calidad",
-                df_citas["Video ID"].unique(),
-            )
-            if st.button("Analizar calidad"):
+            if st.button("Analizar calidad y distribución"):
                 calidad_datos = get_quality_data(
                     cliente_seleccionado,
-                    video_seleccionado,
                     start_date_str,
                     end_date_str,
                 )
                 if calidad_datos:
                     df_calidad = pd.DataFrame(calidad_datos)
-                    # Aplicar el formato de porcentaje a la columna "Porcentaje"
-                    df_calidad["Porcentaje"] = df_calidad["Porcentaje"].map(
-                        "{:.2f}%".format
-                    )
                     st.dataframe(df_calidad)
